@@ -1,0 +1,42 @@
+@@ -1,17 +1,27 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+stages:
+  - stage: cibuild
+    displayName: appcibuild
+    jobs:
+      - job: build
+        displayName: cijob
+        steps:
+          - script: dotnet restore
+            displayName: restorenugetpkg
+          - script: dotnet build
+            displayName: build .NET core
+        
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
+  - stage: Deploy
+    displayName: release
+    jobs: 
+      - job: Deploy
+        steps:
+         - task: AzureRmWebAppDeployment@4
+           inputs:
+             ConnectionType: AzureRM
+             azureSubscription: Pay-As-You-Go848d52ab-6013-4d82-949c-e73066c17cb6
+             appType: webApp
+             WebAppName: spacegamepoc3357
+             packageForLinux: $(system.ArtifactsDirectory)/drop/*.zip 
